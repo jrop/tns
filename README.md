@@ -17,7 +17,7 @@ import fs from 'fs'
 import tns from 'tns'
 // or: const tns = require('tns').default
 
-fs.readFile('tnsnames.ora', 'UTF-8', (err, contents) => {
+fs.readFile('tnsnames.ora', 'utf-8', (err, contents) => {
 	if (err) throw err
 	const ast = tns(contents)
 	console.log(ast)
