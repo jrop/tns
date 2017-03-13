@@ -1,0 +1,3 @@
+extends:
+- jrop
+- jrop/babel

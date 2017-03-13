@@ -1,0 +1,24 @@
+{
+  "name": "tns",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "prepublish": "pkgbuild && npm test",
+    "test": "node lib/test",
+    "pkg://main": "babel src/ -d lib/",
+    "pkg*://main": "babel -w src/ -d lib/"
+  },
+  "dependencies": {
+    "perplex": "^0.4.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-eslint": "^7.1.1",
+    "babel-preset-env": "^1.2.1",
+    "eslint": "^3.17.1",
+    "eslint-config-jrop": "^0.0.1",
+    "pkgbuild": "^0.0.4"
+  },
+  "repository": "jrop/tns"
+}

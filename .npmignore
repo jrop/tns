@@ -1,0 +1,5 @@
+src/
+.editorconfig
+.eslintrc.yml
+.gitignore
+.npmignore
