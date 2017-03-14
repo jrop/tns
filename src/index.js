@@ -1,5 +1,14 @@
 import perplex from 'perplex'
 
+function objectToTnsString(spec) {
+	if (typeof spec == 'string') return spec
+	const inner = Object.keys(spec)
+		.filter(key => typeof spec[key] !== 'function')
+		.map(key => `${key}=${objectToTnsString(spec[key])}`)
+		.join(')(')
+	return `(${inner})`
+}
+
 export default function parse(s) {
 	const lex = perplex(s)
 		.token('$SKIP_COMMENT', /#[^\n]*/)
@@ -13,6 +22,7 @@ export default function parse(s) {
 	while (lex.peek().type != '$EOF') {
 		const conn = connection()
 		connections[conn.name] = conn.desc
+		connections[conn.name].toString = conn.toString
 	}
 	return connections
 
@@ -20,7 +30,8 @@ export default function parse(s) {
 		const name = lex.expect('WORD').match
 		lex.expect('=')
 		const desc = object()
-		return {name, desc}
+		const conn = {name, desc, toString() {return objectToTnsString(desc)}}
+		return conn
 	}
 
 	function object() {
