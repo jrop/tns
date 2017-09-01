@@ -1,5 +1,7 @@
 # tns
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/jrop/tns.svg)](https://greenkeeper.io/)
+
 A simple module to parse the Oracle TNSNames file format.
 
 ## Installation
