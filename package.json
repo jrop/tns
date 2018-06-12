@@ -5,9 +5,9 @@
   "license": "MIT",
   "scripts": {
     "prepublish": "pkgbuild && npm test",
-    "test": "node lib/test",
-    "pkg://main": "babel src/ -d lib/",
-    "pkg*://main": "babel -w src/ -d lib/"
+    "build": "babel src/ -d lib/",
+    "build:watch": "babel -w src/ -d lib/",
+    "test": "node -r babel-register src/test"
   },
   "dependencies": {
     "perplex": "^0.4.1"
@@ -16,9 +16,10 @@
     "babel-cli": "^6.24.0",
     "babel-eslint": "^7.1.1",
     "babel-preset-env": "^1.2.1",
+    "babel-register": "^6.26.0",
     "eslint": "^3.17.1",
     "eslint-config-jrop": "^0.0.1",
-    "pkgbuild": "^0.0.4"
+    "tape": "^4.9.1"
   },
   "repository": "jrop/tns"
 }

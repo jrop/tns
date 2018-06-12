@@ -1,56 +1,63 @@
 import perplex from 'perplex'
 
-function objectToTnsString(spec) {
-	if (typeof spec == 'string') return spec
-	const inner = Object.keys(spec)
-		.filter(key => typeof spec[key] !== 'function')
-		.map(key => `${key}=${objectToTnsString(spec[key])}`)
-		.join(')(')
-	return `(${inner})`
+const keysToStrings = obj =>
+	Object.keys(obj).map(k => `${k}=${obj[k] && typeof obj[k].toString == 'function' ? obj[k].toString() : obj[k]}`)
+
+class _Connections {
+	toString() {
+		return keysToStrings(this).join('\n')
+	}
+}
+class _Object {
+	toString() {
+		return keysToStrings(this).map(part => `(${part})`).join('')
+	}
+}
+
+function parseConnection(lex) {
+	const name = lex.expect('WORD').match
+	lex.expect('=')
+	const desc = parseObject(lex)
+	return {name, desc}
+}
+
+function parseObject(lex) {
+	lex.expect('(')
+	const id = lex.expect('WORD').match
+	lex.expect('=')
+
+	let value
+	if (lex.peek().type == '(') {
+		// read properties
+		value = {}
+		Object.setPrototypeOf(value, _Object.prototype)
+		do {
+			Object.assign(value, parseObject(lex))
+		} while (lex.peek().type == '(')
+	} else
+		// simple value:
+		value = lex.expect('WORD').match
+
+	lex.expect(')')
+	const result = {[id]: value}
+	Object.setPrototypeOf(result, _Object.prototype)
+	return result
 }
 
 export default function parse(s) {
 	const lex = perplex(s)
 		.token('$SKIP_COMMENT', /#[^\n]*/)
 		.token('$SKIP_WS', /\s+/)
-		.token('WORD', /[a-z0-9\._]+/i)
+		.token('WORD', /[a-z0-9\._-]+/i)
 		.token('(', /\(/)
 		.token(')', /\)/)
 		.token('=', /=/)
 
 	const connections = {}
 	while (lex.peek().type != '$EOF') {
-		const conn = connection()
+		const conn = parseConnection(lex)
 		connections[conn.name] = conn.desc
-		connections[conn.name].toString = conn.toString
 	}
+	Object.setPrototypeOf(connections, _Connections.prototype)
 	return connections
-
-	function connection() {
-		const name = lex.expect('WORD').match
-		lex.expect('=')
-		const desc = object()
-		const conn = {name, desc, toString() {return objectToTnsString(desc)}}
-		return conn
-	}
-
-	function object() {
-		lex.expect('(')
-		const id = lex.expect('WORD').match
-		lex.expect('=')
-
-		let value
-		if (lex.peek().type == '(') {
-			// read properties
-			value = {}
-			do {
-				Object.assign(value, object())
-			} while (lex.peek().type == '(')
-		} else
-			// simple value:
-			value = lex.expect('WORD').match
-
-		lex.expect(')')
-		return {[id]: value}
-	}
 }
